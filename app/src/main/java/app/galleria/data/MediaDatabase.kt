@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
+import androidx.paging.PagingSource
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Query
@@ -92,6 +93,32 @@ data class FolderSummary(
     val coverHeight: Int?,
 )
 
+/**
+ * One month of "All" (D-022), as computed by SQLite in the phone's time zone.
+ * The cover is the newest file of the month (like D-010).
+ */
+data class MonthSummary(
+    /** `YYYY-MM`. */
+    val month: String,
+    val itemCount: Int,
+    /** Needed by the query: `MAX()` is what makes SQLite pick the cover row. */
+    val newestMillis: Long,
+    val coverId: Long,
+    val coverVolume: String,
+    val coverIsVideo: Boolean,
+    val coverWidth: Int?,
+    val coverHeight: Int?,
+)
+
+/** Files that belong in Recents and All: folders that are neither excluded nor hidden (D-008). */
+private const val IN_ALL = """
+    FROM media m LEFT JOIN folder_prefs p ON p.folderKey = m.folderKey
+    WHERE COALESCE(p.visibility, 'Normal') = 'Normal'
+"""
+
+/** Newest first: the grids are drawn bottom-up, so index 0 is the bottom-right cell (D-024). */
+private const val NEWEST_FIRST = "ORDER BY m.dateMillis DESC, m.id DESC"
+
 @Dao
 interface MediaDao {
     @Upsert
@@ -130,15 +157,37 @@ interface MediaDao {
     )
     fun folders(): Flow<List<FolderSummary>>
 
-    /** The newest files of folders that are neither excluded nor hidden, newest first. */
+    /** The newest files of All, newest first. */
+    @Query("SELECT m.* $IN_ALL $NEWEST_FIRST LIMIT :limit")
+    fun newest(limit: Int): Flow<List<MediaEntity>>
+
+    @Query("SELECT m.* $IN_ALL $NEWEST_FIRST")
+    fun allPaged(): PagingSource<Int, MediaEntity>
+
+    @Query("SELECT COUNT(*) $IN_ALL")
+    fun allCount(): Flow<Int>
+
+    /**
+     * Months of All, newest first. SQLite takes the bare columns (the cover) from the row with
+     * the newest date of each group, so one pass is enough even with tens of thousands of files.
+     */
     @Query(
         """
-        SELECT m.* FROM media m LEFT JOIN folder_prefs p ON p.folderKey = m.folderKey
-        WHERE COALESCE(p.visibility, 'Normal') = 'Normal'
-        ORDER BY m.dateMillis DESC, m.id DESC LIMIT :limit
+        SELECT strftime('%Y-%m', m.dateMillis / 1000, 'unixepoch', 'localtime') AS month,
+            COUNT(*) AS itemCount, MAX(m.dateMillis) AS newestMillis,
+            m.id AS coverId, m.volume AS coverVolume, m.isVideo AS coverIsVideo,
+            m.width AS coverWidth, m.height AS coverHeight
+        $IN_ALL
+        GROUP BY month ORDER BY month DESC
         """
     )
-    fun newest(limit: Int): Flow<List<MediaEntity>>
+    fun allMonths(): Flow<List<MonthSummary>>
+
+    @Query("SELECT m.* FROM media m WHERE m.folderKey = :folderKey $NEWEST_FIRST")
+    fun folderPaged(folderKey: String): PagingSource<Int, MediaEntity>
+
+    @Query("SELECT COUNT(*) FROM media WHERE folderKey = :folderKey")
+    fun folderCount(folderKey: String): Flow<Int>
 }
 
 @Dao

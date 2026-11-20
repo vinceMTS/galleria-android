@@ -6,6 +6,9 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.content.Context
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.room.withTransaction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +47,22 @@ class MediaRepository(
     val mediaCount: Flow<Int> = db.media().count()
 
     fun newest(limit: Int): Flow<List<MediaEntity>> = db.media().newest(limit)
+
+    /** All (D-021), newest first. */
+    fun allPaged(): Flow<PagingData<MediaEntity>> = pager { db.media().allPaged() }
+    val allCount: Flow<Int> = db.media().allCount()
+    val allMonths: Flow<List<MonthSummary>> = db.media().allMonths()
+
+    /** One folder, newest first (D-024; other orders arrive with "Sort and filter", D-023). */
+    fun folderPaged(folderKey: String): Flow<PagingData<MediaEntity>> = pager { db.media().folderPaged(folderKey) }
+    fun folderCount(folderKey: String): Flow<Int> = db.media().folderCount(folderKey)
+
+    /**
+     * Placeholders keep the full item count, so the grid can jump anywhere (fast scroll, a month
+     * tapped in Months) and Room loads that page directly.
+     */
+    private fun pager(source: () -> androidx.paging.PagingSource<Int, MediaEntity>) =
+        Pager(PagingConfig(pageSize = 150, enablePlaceholders = true, jumpThreshold = 600), pagingSourceFactory = source).flow
 
     suspend fun sync() = withContext(Dispatchers.IO) {
         syncLock.withLock {

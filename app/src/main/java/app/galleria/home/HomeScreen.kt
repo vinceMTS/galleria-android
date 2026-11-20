@@ -1,6 +1,5 @@
 package app.galleria.home
 
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,17 +38,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.galleria.R
+import app.galleria.data.FolderSummary
 import app.galleria.data.FolderVisibility
 import app.galleria.data.MediaEntity
+import app.galleria.media.MediaTile
 import app.galleria.media.Thumbnail
 import app.galleria.media.thumbnailAspect
 import coil3.compose.AsyncImage
+
+/** Where home's tiles lead. */
+class HomeNavigation(
+    val openFolder: (FolderSummary) -> Unit,
+    val openAll: () -> Unit,
+    val openMedia: (MediaEntity) -> Unit,
+)
 
 private const val SPAN = 12 // Recents 4 columns (span 3), Pinned 2 (span 6), Folders 3 (span 4)
 
@@ -72,12 +79,10 @@ private data class Cell(val key: String, val content: @Composable () -> Unit)
  * photo arrives; rows are therefore emitted bottom to top.
  */
 @Composable
-fun HomeScreen(state: HomeState, viewModel: HomeViewModel) {
-    val context = LocalContext.current
-    val notYet = { Toast.makeText(context, R.string.not_yet, Toast.LENGTH_SHORT).show() }
+fun HomeScreen(state: HomeState, viewModel: HomeViewModel, nav: HomeNavigation) {
     var hiddenOpen by rememberSaveable { mutableStateOf(false) }
     val insets = WindowInsets.safeDrawing.asPaddingValues()
-    val rows = homeRows(state, viewModel, hiddenOpen, onToggleHidden = { hiddenOpen = !hiddenOpen }, notYet)
+    val rows = homeRows(state, viewModel, hiddenOpen, onToggleHidden = { hiddenOpen = !hiddenOpen }, nav)
 
     Box(Modifier.fillMaxSize()) {
         LazyVerticalGrid(
@@ -124,7 +129,7 @@ private fun homeRows(
     viewModel: HomeViewModel,
     hiddenOpen: Boolean,
     onToggleHidden: () -> Unit,
-    notYet: () -> Unit,
+    nav: HomeNavigation,
 ): List<Row> {
     val rows = mutableListOf<Row>()
     val sections = state.sections
@@ -148,7 +153,7 @@ private fun homeRows(
                 key = "$prefix-row$i",
                 span = SPAN / perRow,
                 cells = chunk.map { item ->
-                    Cell("$prefix-${item.summary.folderKey}") { FolderTile(item, viewModel, onClick = notYet) }
+                    Cell("$prefix-${item.summary.folderKey}") { FolderTile(item, viewModel, onClick = { nav.openFolder(item.summary) }) }
                 },
             )
         }
@@ -183,8 +188,8 @@ private fun homeRows(
 
     // Bottom: Recents (D-007), newest file right before "All", which closes the page.
     rows += sectionTitle(R.string.home_recents)
-    val cells = state.recents.map { media -> Cell("recent-${media.id}") { MediaTile(media, onClick = notYet) } } +
-        Cell("all") { AllTile(state.allCount, onClick = notYet) }
+    val cells = state.recents.map { media -> Cell("recent-${media.id}") { MediaTile(media, onClick = { nav.openMedia(media) }) } } +
+        Cell("all") { AllTile(state.allCount, onClick = nav.openAll) }
     rows += HomeLayout.rowsEndingFull(cells, HomeLayout.RECENT_COLUMNS).mapIndexed { i, row ->
         Row.Cells("recent-row$i", SPAN / HomeLayout.RECENT_COLUMNS, row)
     }
@@ -197,37 +202,6 @@ private fun sectionTitle(title: Int) = Row.Full("title$title") {
         style = MaterialTheme.typography.titleMedium,
         modifier = Modifier.padding(start = 4.dp, top = 20.dp, bottom = 6.dp),
     )
-}
-
-@Composable
-private fun MediaTile(media: MediaEntity, onClick: () -> Unit) {
-    Box(
-        Modifier
-            .aspectRatio(1f)
-            .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .clickable(onClick = onClick),
-    ) {
-        AsyncImage(
-            model = Thumbnail(media.id, media.volume, media.isVideo, thumbnailAspect(media.width, media.height)),
-            contentDescription = media.name,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-        )
-        // D-027: only videos get an indicator, their duration bottom right.
-        if (media.isVideo && media.durationMillis != null) {
-            Text(
-                formatDuration(media.durationMillis),
-                color = Color.White,
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(4.dp)
-                    .background(Color.Black.copy(alpha = 0.45f), RoundedCornerShape(4.dp))
-                    .padding(horizontal = 4.dp, vertical = 1.dp),
-            )
-        }
-    }
 }
 
 @Composable
@@ -325,12 +299,4 @@ private fun FolderMenu(item: FolderItem, open: Boolean, onDismiss: () -> Unit, v
 @Composable
 private fun MenuAction(text: Int, onDismiss: () -> Unit, action: () -> Unit) {
     DropdownMenuItem(text = { Text(stringResource(text)) }, onClick = { action(); onDismiss() })
-}
-
-internal fun formatDuration(millis: Long): String {
-    val total = millis / 1000
-    val h = total / 3600
-    val m = (total % 3600) / 60
-    val s = total % 60
-    return if (h > 0) "%d:%02d:%02d".format(h, m, s) else "%d:%02d".format(m, s)
 }

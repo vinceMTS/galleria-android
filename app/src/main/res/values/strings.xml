@@ -50,5 +50,10 @@
     <string name="folder_hide">Nascondi</string>
     <string name="folder_unhide">Mostra in home</string>
 
-    <string name="not_yet">Arriva con la griglia (prossimo passo)</string>
+    <!-- All (D-021) -->
+    <string name="all_years">Anni</string>
+    <string name="all_months">Mesi</string>
+    <string name="all_all">Tutte</string>
+
+    <string name="viewer_not_yet">Il visualizzatore arriva con l\'argomento 05</string>
 </resources>

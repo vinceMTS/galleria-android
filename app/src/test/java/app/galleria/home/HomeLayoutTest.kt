@@ -1,5 +1,6 @@
 package app.galleria.home
 
+import app.galleria.media.formatDuration
 import app.galleria.data.FolderPrefsEntity
 import app.galleria.data.FolderSummary
 import app.galleria.data.FolderVisibility
