@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- D-040: the test build has a different icon colour. -->
+    <color name="ic_launcher_background">#C2571A</color>
+</resources>

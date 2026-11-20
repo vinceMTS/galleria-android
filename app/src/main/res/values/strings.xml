@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Galleria</string>
+
+    <string name="access_title">Serve l\'accesso ai tuoi file</string>
+    <string name="access_intro">Galleria funziona solo sul telefono: non ha accesso a internet e non manda nulla da nessuna parte. Per mostrarti le tue cartelle ha bisogno di due permessi.</string>
+
+    <string name="access_media_title">Foto e video</string>
+    <string name="access_media_body">Per vedere tutte le foto e i video, in tutte le cartelle. Con l\'accesso solo ad alcune foto la galleria resterebbe quasi vuota: scegli \"Consenti sempre tutto\".</string>
+    <string name="access_media_partial">Hai concesso l\'accesso solo ad alcune foto. Serve l\'accesso a tutte.</string>
+    <string name="access_media_button">Consenti l\'accesso</string>
+
+    <string name="access_files_title">Gestione dei file</string>
+    <string name="access_files_body">Per spostare e copiare foto in qualsiasi cartella (anche Download e WhatsApp) e salvare un fotogramma accanto al suo video, mantenendo la data originale dei file.</string>
+    <string name="access_files_button">Apri le impostazioni</string>
+
+    <string name="access_open_settings">Apri le impostazioni dell\'app</string>
+    <string name="access_granted">Concesso</string>
+
+    <string name="placeholder_ready">Accesso concesso. La home arriva nel prossimo passo.</string>
+</resources>
