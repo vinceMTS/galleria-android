@@ -1,0 +1,204 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "6e36d95308cb257ccea5a627f6c56d38",
+    "entities": [
+      {
+        "tableName": "media",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `volume` TEXT NOT NULL, `folderKey` TEXT NOT NULL, `folderName` TEXT NOT NULL, `relativePath` TEXT NOT NULL, `name` TEXT NOT NULL, `isVideo` INTEGER NOT NULL, `mimeType` TEXT, `dateTakenMillis` INTEGER, `dateModifiedMillis` INTEGER NOT NULL, `dateMillis` INTEGER NOT NULL, `sizeBytes` INTEGER NOT NULL, `durationMillis` INTEGER, `width` INTEGER, `height` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "volume",
+            "columnName": "volume",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "folderKey",
+            "columnName": "folderKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "folderName",
+            "columnName": "folderName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "relativePath",
+            "columnName": "relativePath",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isVideo",
+            "columnName": "isVideo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mimeType",
+            "columnName": "mimeType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dateTakenMillis",
+            "columnName": "dateTakenMillis",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "dateModifiedMillis",
+            "columnName": "dateModifiedMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateMillis",
+            "columnName": "dateMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sizeBytes",
+            "columnName": "sizeBytes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "durationMillis",
+            "columnName": "durationMillis",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "width",
+            "columnName": "width",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "height",
+            "columnName": "height",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_media_folderKey_dateMillis",
+            "unique": false,
+            "columnNames": [
+              "folderKey",
+              "dateMillis"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_folderKey_dateMillis` ON `${TABLE_NAME}` (`folderKey`, `dateMillis`)"
+          },
+          {
+            "name": "index_media_dateMillis",
+            "unique": false,
+            "columnNames": [
+              "dateMillis"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_dateMillis` ON `${TABLE_NAME}` (`dateMillis`)"
+          },
+          {
+            "name": "index_media_volume",
+            "unique": false,
+            "columnNames": [
+              "volume"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_volume` ON `${TABLE_NAME}` (`volume`)"
+          }
+        ]
+      },
+      {
+        "tableName": "folder_prefs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`folderKey` TEXT NOT NULL, `visibility` TEXT NOT NULL, `pinnedOrder` INTEGER, `coverMediaId` INTEGER, PRIMARY KEY(`folderKey`))",
+        "fields": [
+          {
+            "fieldPath": "folderKey",
+            "columnName": "folderKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "visibility",
+            "columnName": "visibility",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pinnedOrder",
+            "columnName": "pinnedOrder",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "coverMediaId",
+            "columnName": "coverMediaId",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "folderKey"
+          ]
+        }
+      },
+      {
+        "tableName": "sync_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`volume` TEXT NOT NULL, `mediaStoreVersion` TEXT NOT NULL, `generation` INTEGER NOT NULL, PRIMARY KEY(`volume`))",
+        "fields": [
+          {
+            "fieldPath": "volume",
+            "columnName": "volume",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mediaStoreVersion",
+            "columnName": "mediaStoreVersion",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "generation",
+            "columnName": "generation",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "volume"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6e36d95308cb257ccea5a627f6c56d38')"
+    ]
+  }
+}

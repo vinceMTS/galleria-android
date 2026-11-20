@@ -17,5 +17,38 @@
     <string name="access_open_settings">Apri le impostazioni dell\'app</string>
     <string name="access_granted">Concesso</string>
 
-    <string name="placeholder_ready">Accesso concesso. La home arriva nel prossimo passo.</string>
+    <!-- First run (D-009) -->
+    <string name="first_run_title">Cosa mostrare in Recenti e Tutto?</string>
+    <string name="first_run_body">Le cartelle spuntate entrano in Recenti e in Tutto. Quelle non spuntate restano comunque in home tra le cartelle. Abbiamo tolto le cartelle di app di messaggi e dei download: puoi cambiare come vuoi.</string>
+    <string name="first_run_reading">Sto leggendo le tue cartelle…</string>
+    <string name="first_run_empty">Non ci sono foto o video sul telefono.</string>
+    <string name="first_run_skip">Salta</string>
+    <string name="first_run_confirm">Conferma</string>
+    <string name="first_run_suggested_off">App di messaggi o download</string>
+
+    <!-- Home (D-006) -->
+    <string name="home_recents">Recenti</string>
+    <string name="home_all">Tutto</string>
+    <string name="home_pinned">Fissate</string>
+    <string name="home_folders">Cartelle</string>
+    <string name="home_empty">Non ci sono foto o video sul telefono.</string>
+    <string name="home_excluded_badge">Esclusa da Tutto</string>
+    <plurals name="home_hidden_count">
+        <item quantity="one">%d cartella nascosta</item>
+        <item quantity="other">%d cartelle nascoste</item>
+    </plurals>
+    <plurals name="items_count">
+        <item quantity="one">%d elemento</item>
+        <item quantity="other">%d elementi</item>
+    </plurals>
+
+    <!-- Folder menu (long press, provisional until topic 08) -->
+    <string name="folder_pin">Fissa</string>
+    <string name="folder_unpin">Togli dalle fissate</string>
+    <string name="folder_exclude">Escludi da Recenti e Tutto</string>
+    <string name="folder_include">Includi in Recenti e Tutto</string>
+    <string name="folder_hide">Nascondi</string>
+    <string name="folder_unhide">Mostra in home</string>
+
+    <string name="not_yet">Arriva con la griglia (prossimo passo)</string>
 </resources>
